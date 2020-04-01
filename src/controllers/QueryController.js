@@ -1,25 +1,23 @@
 const mariadb = require('mysql');
 
+const connectionDb = mariadb.createConnection({
+    host: process.env.MYSQL_HOST,
+    port: process.env.MYSQL_PORT,
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_ROOT_PASSWORD,
+    database: process.env.MYSQL_DATABASE
+});
+
 module.exports = {
 
     init(req, res){
-        res.send('ATHON_API!')
+        res.send('ATHON_API!');
     },
 
     async executeQuery(req, res) {
-        const connectionDb = mariadb.createConnection({
-            host: process.env.MYSQL_HOST,
-            port: process.env.MYSQL_PORT,
-            user: process.env.MYSQL_USER,
-            password: process.env.MYSQL_ROOT_PASSWORD,
-            database: process.env.MYSQL_DATABASE
-        });
-
         connectionDb.query(req, function(error, results, fields){
             if (error) res.json(error);
             else res.json(results);
-            connectionDb.end();
-            console.log('Success');
         });
     },
 
@@ -51,41 +49,136 @@ module.exports = {
             inner join weapon wpn on wcc.id_weapon = wpn.id_weapon` + filter, res);
     },
 
-    insertCrime(req, res){
-        this.executeQuery(
-            `insert into crime (tx_country, dt_crime) values ('${req.body.pais}', '${req.body.data}');
+    async executeTransaction(req, res){
+        connectionDb.beginTransaction(function(err){
+            if (err) { throw err; }
+            connectionDb.query(`insert into crime (tx_country, dt_crime) values ('${req.body.pais}', '${req.body.data}')`, function(err, result){
+                if (err) {
+                    connectionDb.rollback(function(){
+                        throw err;
+                    });
+                }
 
-            insert into victim(tx_name)
-            select x.tx_name
-            from (select '${req.body.vitima}' tx_name) x
-            where not exists (select 1 from victim vt where vt.tx_name = x.tx_name);`
+                var log = result.insertId;
 
-            // insert into criminal(tx_name) select x.tx_name from (select '${req.body.criminoso}' tx_name) x where not exists
-            // (select 1 from criminal cr where cr.tx_name = x.tx_name);
+                connectionDb.query(`insert into victim(tx_name) select x.tx_name from (select '${req.body.vitima}' tx_name) x where not exists (select 1 from victim vt where vt.tx_name = x.tx_name)`, function(err, result){
+                    if (err) {
+                        connectionDb.rollback(function(){
+                            throw err;
+                        });
+                    }
 
-            // insert into crime_type(tx_type) select x.tx_type from (select '${req.body.tipoCrime}' tx_type) x where not exists
-            // (select 1 from crime_type ct where ct.tx_type = x.tx_type);
+                    connectionDb.query(`insert into criminal(tx_name) select x.tx_name from (select '${req.body.criminoso}' tx_name) x where not exists (select 1 from criminal cr where cr.tx_name = x.tx_name)`, function(err, result){
+                        if (err) {
+                            connectionDb.rollback(function(){
+                                throw err;
+                            });
+                        }
 
-            // insert into weapon_type(tx_weapon_type) select x.tx_weapon_type from 
-            // (select '${req.body.tipoArma}' tx_weapon_type) x where not exists
-            // (select 1 from weapon_type wt where wt.tx_weapon_type = x.tx_weapon_type);
+                        connectionDb.query(`insert into crime_type(tx_type) select x.tx_type from (select '${req.body.tipoCrime}' tx_type) x where not exists (select 1 from crime_type ct where ct.tx_type = x.tx_type)`, function(err, result){
+                            if (err) {
+                                connectionDb.rollback(function(){
+                                    throw err;
+                                });
+                            }
 
-            // insert into weapon(tx_model, id_weapon_type) select x.tx_model, x.id_weapon_type from (select '${req.body.arma}' tx_model,
-            // (select id_weapon_type from weapon_type where tx_weapon_type = '${req.body.tipoArma}') id_weapon_type) x where not exists
-            // (select 1 from weapon wp, weapon_type wt where wp.tx_model = x.tx_model and wt.id_weapon_type = x.id_weapon_type);
+                            connectionDb.query(`insert into weapon_type(tx_weapon_type) select x.tx_weapon_type from (select '${req.body.tipoArma}' tx_weapon_type) x where not exists (select 1 from weapon_type wt where wt.tx_weapon_type = x.tx_weapon_type)`, function(err, result){
+                                if (err) {
+                                    connectionDb.rollback(function(){
+                                        throw err;
+                                    });
+                                }
 
-            // insert into weapon_crime (id_weapon, id_crime) values 
-            // ((select id_weapon from weapon where tx_model = '${req.body.arma}'), (select max(id_crime) from crime));
+                                connectionDb.query(`insert into weapon(tx_model, id_weapon_type) select x.tx_model, x.id_weapon_type from (select '${req.body.arma}' tx_model, (select id_weapon_type from weapon_type where tx_weapon_type = '${req.body.tipoArma}') id_weapon_type) x where not exists (select 1 from weapon wp, weapon_type wt where wp.tx_model = x.tx_model and wt.id_weapon_type = x.id_weapon_type)`, function(err, result){
+                                    if (err) {
+                                        connectionDb.rollback(function(){
+                                            throw err;
+                                        });
+                                    }
 
-            // insert into victim_crime (id_victim, id_crime) values 
-            // ((select id_victim from victim where tx_name = '${req.body.vitima}'), (select max(id_crime) from crime));
-            
-            // insert into criminal_crime (id_criminal, id_crime, id_crime_type) values 
-            // ((select id_criminal from criminal where tx_name = '${req.body.criminoso}'), (select max(id_crime) from crime), 
-            // (select id_crime_type from crime_type where tx_type = '${req.body.tipoCrime}'));`
-            , res);
-        
+                                    connectionDb.query(`insert into weapon_crime (id_weapon, id_crime) values ((select id_weapon from weapon where tx_model = '${req.body.arma}'), ${log})`, function(err, result){
+                                        if (err) {
+                                            connectionDb.rollback(function(){
+                                                throw err;
+                                            });
+                                        }
+
+                                        connectionDb.query(`insert into victim_crime (id_victim, id_crime) values ((select id_victim from victim where tx_name = '${req.body.vitima}'), ${log})`, function(err, result){
+                                            if (err) {
+                                                connectionDb.rollback(function(){
+                                                    throw err;
+                                                });
+                                            }
+
+                                            connectionDb.query(`insert into criminal_crime (id_criminal, id_crime, id_crime_type) values ((select id_criminal from criminal where tx_name = '${req.body.criminoso}'), ${log}, (select id_crime_type from crime_type where tx_type = '${req.body.tipoCrime}'))`, function(err, result){
+                                                if (err) {
+                                                    connectionDb.rollback(function(){
+                                                        throw err;
+                                                    });
+                                                }
+
+                                                connectionDb.commit(function(err){
+                                                    if (err) {
+                                                        connectionDb.rollback(function(){
+                                                            throw err;
+                                                        });
+                                                    }
+
+                                                    res.send('Transaction Complete!')
+                                                });
+                                            });
+                                        });
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    },
+
+    async deleteCrime(req, res){
+        connectionDb.beginTransaction(function(err){
+            if (err) { throw err; }
+            connectionDb.query('delete from criminal_crime where id_crime =' + parseInt(req.params.id), function(err, result){
+                if (err) {
+                    connectionDb.rollback(function(){
+                        throw err;
+                    });
+                }
+                connectionDb.query('delete from victim_crime where id_crime =' + parseInt(req.params.id), function(err, result){
+                    if (err) {
+                        connectionDb.rollback(function(){
+                            throw err;
+                        });
+                    }
+                    connectionDb.query('delete from weapon_crime where id_crime =' + parseInt(req.params.id), function(err, result){
+                        if (err) {
+                            connectionDb.rollback(function(){
+                                throw err;
+                            });
+                        }
+                        connectionDb.query('delete from crime where id_crime =' + parseInt(req.params.id), function(err, result){
+                            if (err) {
+                                connectionDb.rollback(function(){
+                                    throw err;
+                                });
+                            }
+                            
+                            connectionDb.commit(function(err){
+                                if (err) {
+                                    connectionDb.rollback(function(){
+                                        throw err;
+                                    });
+                                }
+                                res.send("Number of records deleted: " + result.affectedRows)
+                            });
+                        });
+                    });
+                });
+            });
+        });
+
     }
-
-
 }
