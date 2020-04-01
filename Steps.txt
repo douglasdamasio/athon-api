@@ -1,4 +1,4 @@
-*** Diario de criação da API em Node.js ***
+*** Steps de criação da API em Node.js ***
 
 -> Inicialização do npm com parametro -y (yes to all) para pular as confirmações
 	npm init -y
@@ -81,3 +81,52 @@ delete from criminal_crime where id_crime = 9;
 delete from victim_crime where id_crime = 9;
 delete from weapon_crime where id_crime = 9;
 delete from crime where id_crime = 9;
+
+-> Instalação da dependencia do mysql
+	npm install mysql
+
+-> Importação para o server.js do modulo instalado
+-----------------------------------------------------------	
+	const express = require('express');
+	const mariadb = require('mysql');
+
+	// Porta
+	const port = 3000;
+
+	// Iniciando o App
+	const app = express();
+
+	// Iniciando o banco
+	const connectionDb = mariadb.createConnection({
+	    host: 'localhost',
+	    port: 3306,
+	    user: 'root',
+	    password: 'athon',
+	    database: 'police'
+	});
+
+	connectionDb.connect(err => {
+	    if (err) return console.log(err);
+	    console.log('Conected!')
+	    connectionDb.end();
+	})
+
+	// routes
+	app.get('/', (req, res) => {
+	    res.send('Ok')
+	});
+
+
+	app.listen(port);
+-----------------------------------------------------------
+
+{
+	"pais":,
+	"data":,
+	"vitima",
+	"criminoso",
+	"tipoCrime"
+	"arma":,
+	"tipoArma":,
+
+}
