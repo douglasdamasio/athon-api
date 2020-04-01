@@ -12,5 +12,8 @@ routes.get('/weapon/:id?', (req, res) => {QueryController.showWeapons(req, res)}
 
 routes.get('/crime/:id?', (req, res) => {QueryController.showCrimes(req, res)});
 
+routes.post('/crime/insert', (req, res) => {QueryController.insertCrime(req, res);});
+
+
 
 module.exports = routes;

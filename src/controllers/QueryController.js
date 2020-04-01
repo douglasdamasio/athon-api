@@ -52,7 +52,39 @@ module.exports = {
     },
 
     insertCrime(req, res){
+        this.executeQuery(
+            `insert into crime (tx_country, dt_crime) values ('${req.body.pais}', '${req.body.data}');
 
+            insert into victim(tx_name)
+            select x.tx_name
+            from (select '${req.body.vitima}' tx_name) x
+            where not exists (select 1 from victim vt where vt.tx_name = x.tx_name);`
+
+            // insert into criminal(tx_name) select x.tx_name from (select '${req.body.criminoso}' tx_name) x where not exists
+            // (select 1 from criminal cr where cr.tx_name = x.tx_name);
+
+            // insert into crime_type(tx_type) select x.tx_type from (select '${req.body.tipoCrime}' tx_type) x where not exists
+            // (select 1 from crime_type ct where ct.tx_type = x.tx_type);
+
+            // insert into weapon_type(tx_weapon_type) select x.tx_weapon_type from 
+            // (select '${req.body.tipoArma}' tx_weapon_type) x where not exists
+            // (select 1 from weapon_type wt where wt.tx_weapon_type = x.tx_weapon_type);
+
+            // insert into weapon(tx_model, id_weapon_type) select x.tx_model, x.id_weapon_type from (select '${req.body.arma}' tx_model,
+            // (select id_weapon_type from weapon_type where tx_weapon_type = '${req.body.tipoArma}') id_weapon_type) x where not exists
+            // (select 1 from weapon wp, weapon_type wt where wp.tx_model = x.tx_model and wt.id_weapon_type = x.id_weapon_type);
+
+            // insert into weapon_crime (id_weapon, id_crime) values 
+            // ((select id_weapon from weapon where tx_model = '${req.body.arma}'), (select max(id_crime) from crime));
+
+            // insert into victim_crime (id_victim, id_crime) values 
+            // ((select id_victim from victim where tx_name = '${req.body.vitima}'), (select max(id_crime) from crime));
+            
+            // insert into criminal_crime (id_criminal, id_crime, id_crime_type) values 
+            // ((select id_criminal from criminal where tx_name = '${req.body.criminoso}'), (select max(id_crime) from crime), 
+            // (select id_crime_type from crime_type where tx_type = '${req.body.tipoCrime}'));`
+            , res);
+        
     }
 
 
