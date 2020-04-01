@@ -1,5 +1,7 @@
+// Importação do modulo de conexão com o banco
 const mariadb = require('mysql');
 
+// Abertura da conexão com o banco
 const connectionDb = mariadb.createConnection({
     host: process.env.MYSQL_HOST,
     port: process.env.MYSQL_PORT,
@@ -8,12 +10,14 @@ const connectionDb = mariadb.createConnection({
     database: process.env.MYSQL_DATABASE
 });
 
+// Modulos exportados na chamada
 module.exports = {
-
+    // Modulo para Test de comunicação
     init(req, res){
-        res.send('ATHON_API!');
+        res.send('Teste ATHON_API! -> by. Douglas Damasio');
     },
 
+    // Modulo para execução deselect querys
     async executeQuery(req, res) {
         connectionDb.query(req, function(error, results, fields){
             if (error) res.json(error);
@@ -21,9 +25,12 @@ module.exports = {
         });
     },
 
+    // Modulo para mostrar a lista de crimes
     showCrimes(req, res){
         let filter = '';
         if (req.params.id) filter = ' where cri.id_crime=' + parseInt(req.params.id);
+        
+        // Chama a execução passando a query
         this.executeQuery(
             `select cri.id_crime as 'ID CRIME', 
             vic.tx_name as 'VITIMAS', 
@@ -40,6 +47,7 @@ module.exports = {
             inner join criminal crm		 	on ccc.id_criminal = crm.id_criminal` + filter, res);
     },
 
+    // Modulo para mostrar a lista de armas utilizadas em algum crime
     showWeapons(req, res){
         let filter = '';
         if (req.params.id) filter = ' where id_crime=' + parseInt(req.params.id);
@@ -49,6 +57,7 @@ module.exports = {
             inner join weapon wpn on wcc.id_weapon = wpn.id_weapon` + filter, res);
     },
 
+    // Modulo para o insert de um crime
     async executeTransaction(req, res){
         connectionDb.beginTransaction(function(err){
             if (err) { throw err; }
@@ -138,6 +147,7 @@ module.exports = {
         });
     },
 
+    // Modulo para Exclusão de um crime
     async deleteCrime(req, res){
         connectionDb.beginTransaction(function(err){
             if (err) { throw err; }
