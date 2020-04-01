@@ -14,7 +14,10 @@ const connectionDb = mariadb.createConnection({
 module.exports = {
     // Modulo para Test de comunicação
     init(req, res){
-        res.send('Teste ATHON_API! -> by. Douglas Damasio');
+        res.json({ 
+            "mensagem": "A ATHON_API está pronta!",
+            "author": "Douglas Damasio"
+        });
     },
 
     // Modulo para execução deselect querys

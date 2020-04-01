@@ -31,7 +31,7 @@ routes.get('/crime/:id?', (req, res) => {QueryController.showCrimes(req, res)});
 routes.post('/crime/insert', (req, res) => {QueryController.executeTransaction(req, res);});
 
 // Rota delete com a obrigação de passar o ID do crime
-routes.delete('/crime/:id', (req, res) => {QueryController.deleteCrime(req, res)});
+routes.delete('/crime/delete/:id', (req, res) => {QueryController.deleteCrime(req, res)});
 
 
 // Exporta as routes para o arquivo server.js
