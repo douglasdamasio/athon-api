@@ -22,11 +22,11 @@ vítimas, criminosos);
 ### 1. Trazer todas as armas que já foram utilizadas em algum crime.
 Utilize a rota abaixo com o método `GET` para receber em formato *JSON* todas as armas que já foram utilizadas em algum crime:
 
-> `/weapon`
+`/weapon`
 
 Ou utilize a rota abaixo caso queria saber a arma de um crime especifico.
 
-> `/weapon/[id]`
+`/weapon/[id]`
 
 Onde *[ id ]* é passado o ID do Crime
 
@@ -36,11 +36,11 @@ Onde *[ id ]* é passado o ID do Crime
 
 Utiltiza a rota abaixo com o método `GET` para receber em formato *JSON* todos os crimes cadastrados
 
-> `/crimes`
+`/crimes`
 
 Ou utilize a rota abaixo para saber todas informações acerca de um determinado crime
 
-> `/crimes/[id]`
+`/crimes/[id]`
 
 Onde *[ id ]* é passado o ID do Crime
 
@@ -48,7 +48,8 @@ Onde *[ id ]* é passado o ID do Crime
 
 Para a inserção de um novo crime siga o padrão do arquivo *JSON* abaixo
 
-`{	
+{
+
     "pais": "[PAÍS]",
     "data": "[yyyy-mm-dd HH:MM:SS]",
     "vitima": "[NOME_VITIMA]",
@@ -56,19 +57,19 @@ Para a inserção de um novo crime siga o padrão do arquivo *JSON* abaixo
     "tipoCrime": "[TIPO_DO_CRIME]",
     "arma": "[ARMA]",	
     "tipoArma": "[TIPO_ARMA]"
-}`
+}
 
 Onde as variaveis entre colchetes devem ser substituidas pelos dados a serem inseridos sobre o crime.
 
 Utilize a rota abaixo com o método `POST`:
 
-> `/crime/insert`
+`/crime/insert`
 
 ### 4. Remover um crime do sistema
 
 No caso da remoção utilize o método `DELETE` passando o id do crime no parametro da rota, da seguinte forma:
 
-> `/crime/delete/[id]`
+`/crime/delete/[id]`
 
 Onde *[ id ]* é passado o ID do Crime ao qual deseja deletar.
 
@@ -78,6 +79,6 @@ _________________________________________________
 
 Todas as rotas partem da origem `/api` (rota raiz) e caso queira fazer um teste de comunicação utilize a rota raiz para obeter a mensagem no formato *JSON*:
 
-> *A ATHON_API está pronta!*
+*A ATHON_API está pronta!*
 
-> *Douglas Damasio*
+*Douglas Damasio*
