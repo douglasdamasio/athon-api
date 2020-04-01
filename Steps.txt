@@ -1,0 +1,83 @@
+*** Diario de criação da API em Node.js ***
+
+-> Inicialização do npm com parametro -y (yes to all) para pular as confirmações
+	npm init -y
+
+-> Criação do arquivo '.gitignore', incluindo com o conteudo abaixo
+	node_modules/
+
+-> Instalação da primeira dependencia, o express
+	npm install express
+
+-> Criação do arquivo 'server.js' com a rota teste
+-----------------------------------------------------------	
+	const express = require('express');
+
+	const port = 3000;
+
+	const app = express();
+
+	app.get('/', (req, res) => {
+	    res.send('Ok')
+	});
+
+	app.listen(port);
+-----------------------------------------------------------	
+
+-> Instalando a dependencia do nodemon.
+-> Utilizando o -D para salvar como dependencia de desenvolvedor
+	npm install -D nodemon
+
+-> Automatizar o nodemon no package.json, dentro de scripts, adicione:
+	"dev": "nodemon server.js"
+
+-> Criação do Container do MySQL no docker, com o comando abaixo
+	docker run -d --name maria -p 3306:3306 -e MYSQL_ROOT_PASSWORD=athon mariadb
+
+-> run : comando para criar e inicializar
+-> -d : rodar em background
+-> --name : para o nome do projeto
+-> -p : porta da maquina local:porta do container
+-> -e : variavel de ambiente
+
+-> Configurar o banco de dados mysql no workbench
+-> Paciencia esse processo demora a estar disponivel
+
+-> Importação do arquivo self-container file recebido pela athon-tech
+
+-> Criação das consultas no banco
+
+-- 1
+select distinct wpn.tx_model as 'ARMAS'
+from weapon_crime wcc
+inner join weapon wpn on wcc.id_weapon = wpn.id_weapon
+-- where wcc.id_crime = 2;
+-- -----------------------------------------------------------------
+-- 2
+select cri.id_crime as 'ID CRIME', 
+vic.tx_name as 'VITIMAS', 
+wpn.tx_model as 'ARMAS', 
+crm.tx_name as 'CRIMINOSOS', 
+cri.tx_country as 'PAÍS',
+cri.dt_crime as 'DATA'
+from crime cri
+inner join victim_crime vcc 	on cri.id_crime = vcc.id_crime
+inner join victim vic 			on vcc.id_victim = vic.id_victim
+inner join weapon_crime wcc 	on cri.id_crime = wcc.id_crime
+inner join weapon wpn 			on wcc.id_weapon = wpn.id_weapon
+inner join criminal_crime ccc 	on cri.id_crime = ccc.id_crime
+inner join criminal crm		 	on ccc.id_criminal = crm.id_criminal
+where cri.id_crime = 2;
+-- -----------------------------------------------------------------
+-- 3
+
+insert into crime (tx_country, dt_crime) values ('Canadá', '2020-03-31 00:00:00');
+insert into weapon_crime (id_weapon, id_crime) values ((select id_weapon from weapon where tx_model = 'AK-47'), (select max(id_crime) from crime));
+insert into victim_crime (id_victim, id_crime) values ((select id_victim from victim where tx_name = 'Hyoga'), (select max(id_crime) from crime));
+insert into criminal_crime (id_criminal, id_crime, id_crime_type) values ((select id_criminal from criminal where tx_name = 'Kami'), (select max(id_crime) from crime), (select id_crime_type from crime_type where tx_type = 'Murder'));
+
+-- 4
+delete from criminal_crime where id_crime = 9;
+delete from victim_crime where id_crime = 9;
+delete from weapon_crime where id_crime = 9;
+delete from crime where id_crime = 9;
