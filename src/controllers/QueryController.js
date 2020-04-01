@@ -40,6 +40,7 @@ module.exports = {
             wpn.tx_model as 'ARMAS', 
             wpp.tx_weapon_type as 'TIPO ARMA',
             crm.tx_name as 'CRIMINOSOS', 
+            cty.tx_type as 'TIPO CRIME',
             cri.tx_country as 'PAÍS',
             cri.dt_crime as 'DATA'
             from crime cri
@@ -47,9 +48,10 @@ module.exports = {
             inner join victim vic 			on vcc.id_victim = vic.id_victim
             inner join weapon_crime wcc 	on cri.id_crime = wcc.id_crime
             inner join weapon wpn 			on wcc.id_weapon = wpn.id_weapon
-            inner join weapon_type wpp on wpn.id_weapon_type = wpp.id_weapon_type
+            inner join weapon_type wpp 		on wpn.id_weapon_type = wpp.id_weapon_type
             inner join criminal_crime ccc 	on cri.id_crime = ccc.id_crime
-            inner join criminal crm		 	on ccc.id_criminal = crm.id_criminal` + filter, res);
+            inner join criminal crm		 	on ccc.id_criminal = crm.id_criminal
+            inner join crime_type cty 	on ccc.id_crime_type = cty.id_crime_type` + filter, res);
     },
 
     // Modulo para mostrar a lista de armas utilizadas em algum crime
