@@ -38,6 +38,7 @@ module.exports = {
             `select cri.id_crime as 'ID CRIME', 
             vic.tx_name as 'VITIMAS', 
             wpn.tx_model as 'ARMAS', 
+            wpp.tx_weapon_type as 'TIPO ARMA',
             crm.tx_name as 'CRIMINOSOS', 
             cri.tx_country as 'PAÍS',
             cri.dt_crime as 'DATA'
@@ -46,6 +47,7 @@ module.exports = {
             inner join victim vic 			on vcc.id_victim = vic.id_victim
             inner join weapon_crime wcc 	on cri.id_crime = wcc.id_crime
             inner join weapon wpn 			on wcc.id_weapon = wpn.id_weapon
+            inner join weapon_type wpp on wpn.id_weapon_type = wpp.id_weapon_type
             inner join criminal_crime ccc 	on cri.id_crime = ccc.id_crime
             inner join criminal crm		 	on ccc.id_criminal = crm.id_criminal` + filter, res);
     },
@@ -55,9 +57,10 @@ module.exports = {
         let filter = '';
         if (req.params.id) filter = ' where id_crime=' + parseInt(req.params.id);
         this.executeQuery(
-            `select distinct wpn.tx_model as 'WEAPON'
+            `select distinct wpn.tx_model as 'ARMAS', wpp.tx_weapon_type as 'TIPO DA ARMA'
             from weapon_crime wcc
-            inner join weapon wpn on wcc.id_weapon = wpn.id_weapon` + filter, res);
+            inner join weapon wpn on wcc.id_weapon = wpn.id_weapon
+            inner join weapon_type wpp on wpn.id_weapon_type = wpp.id_weapon_type` + filter, res);
     },
 
     // Modulo para o insert de um crime
