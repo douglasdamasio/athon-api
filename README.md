@@ -77,7 +77,7 @@ _________________________________________________
 
 #### NOTA
 
-Todas as rotas partem da origem `/api` (rota raiz) e caso queira fazer um teste de comunicação utilize a rota raiz para obeter a mensagem no formato *JSON*:
+Todas as rotas partem da origem `/api` (rota raiz) e caso queira fazer um teste de comunicação utilize a rota raiz para obter a mensagem no formato *JSON*:
 
 *A ATHON_API está pronta!*
 
